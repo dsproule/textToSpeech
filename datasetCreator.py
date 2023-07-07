@@ -61,7 +61,7 @@ class DatasetProcessor:
 	# All files generated with process() will be pushed to the train set. 
 	# This function will transport the last chunks to the validation set
 	def create_val(self, chunkCount):
-		splitInd = int(self.trainSplit * chunkCount)
+		splitInd = int(self.trainSplit * chunkCount) 
 		categories = ['labels', 'specs', 'seqLens']
 
 		for category in categories:
