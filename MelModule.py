@@ -27,7 +27,7 @@ class Mel:
 			padded[:signal.shape[0]] = signal
 			signal = padded
 		elif signal.shape[0] > self.sampleLimit:
-			raise Exception("Input file too long to be padded up.")
+			raise OverflowError("Input file too long to be padded up.")
 
 		return signal, orig_len
 

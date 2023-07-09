@@ -60,6 +60,8 @@ class Caster:
 	# returns: a list of integers in format [<s>, string, <e>, 0, ..., 0], label length
 	def padded_str_to_map(self, string, padLen):
 		mapping = np.zeros(padLen)
-		mapping[:len(string) + 2] = self.str_to_map(string)
+		
+		rawMap = self.str_to_map(string)
+		mapping[:rawMap.shape[0]] = rawMap
 
 		return mapping, len(string) + 2

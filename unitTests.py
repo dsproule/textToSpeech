@@ -1,6 +1,6 @@
 # File used to test functionality of every module created in this
 import MelModule
-import Caster
+import CasterModule
 import librosa
 import numpy as np
 from CONSTS import *
@@ -11,7 +11,11 @@ SR = 8000
 TESTS = 20
 
 """
-Test embeddings
+datasetGenerator.py
+	- DO ALL TESTS FOR COMMONVOICE AND LIBRISPEECH
+	- test to see if buffer gets filled properly
+	- confirm process is able to handle .flac and mp3
+	- confirm files are properly split even if some had to be ditched (eg. Over buffer)
 
 """
 
@@ -20,6 +24,18 @@ Test embeddings
 # All functions return codes depending on success
 	# 0 --> successful on all tests
 	# num --> failed on this test
+
+def common_voice_buffer_fill():
+	enPath = 'dataset\\validated.tsv'
+	df = pd.read_table(enPath)	
+	for path, sent in zip(df["path"], df["sentence"]):
+		if type(sent) == type("string"):
+			file = "dataset\\clips\\" + path
+			label = sent
+			dataset.append((file, label))
+			if len(dataset) >= BUFF_LIM:
+				pass
+				
 def mel_normalize_clip_test(signal):
 	paddedSig = melConv._pad_sig(audioFiles[0])
 	if paddedSig[0].shape[0] != (SR * CLIP_DUR):					# Improper length padded
@@ -154,7 +170,7 @@ if __name__ == '__main__':
 	del melConv
 
 	# Cast tests ===================================================================
-	c = Caster.Caster()
+	c = CasterModule.Caster()
 
 	result = cast_stm()
 	correct += 3 - result
@@ -180,5 +196,8 @@ if __name__ == '__main__':
 	correct += 1 - result
 	print(result_str("cast_compat_3", result))
 	del c
+
+	# Dataset generator tests ===================================================================
+
 
 	print(f"\n===============================================================\n({correct} / {TESTS}) tests were correct")
