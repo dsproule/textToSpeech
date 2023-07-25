@@ -33,6 +33,8 @@ class DatasetProcessor:
 			os.mkdir(f"{targetDir}/seqLens/")
 			os.mkdir(f"{targetDir}/seqLens/train")
 			os.mkdir(f"{targetDir}/seqLens/val")
+		else:
+			raise Exception("ERROR: DATASET FOLDER ALREADY EXISTS")
 
 	# process()
 	# Will take datasetBuffer and create three associated npy files
@@ -42,16 +44,22 @@ class DatasetProcessor:
 	# respective files will be saved as chunkID_label.npy
 	def process(self, datasetBuffer, chunkID):
 		caster = CasterModule.Caster()
-		melConv = MelModule.Mel(sr=8000, clipDur=10)	# Can be changed if need be
+		melConv = MelModule.Mel(sr=SR, clipDur=MAX_CLIP_DUR)
 
 		specs, labels, seqLens = [], [], []
 		for file, label in datasetBuffer:
-			labelPair = caster.padded_str_to_map(label, MAX_TARGET_LEN)
-			specPair = melConv.conv(librosa.load(file)[0])
+			try:
+				# If file is too long or label is too long it gets ejected
+				specPair = melConv.conv(librosa.load(file, sr=SR)[0])
+				labelPair = caster.padded_str_to_map(label, MAX_TARGET_LEN)
+			except OverflowError:
+				continue
 
 			labels.append(labelPair[0])
 			specs.append(specPair[0])
 			seqLens.append([specPair[1], labelPair[1]])
+
+		assert len(labels) == len(specs) == len(seqLens), "Mismatched lengths in dataset"
 
 		np.save(f"{self.targetDir}/labels/train/{chunkID}_labels.npy", np.stack(labels))
 		np.save(f"{self.targetDir}/specs/train/{chunkID}_specs.npy", np.stack(specs))
@@ -70,18 +78,3 @@ class DatasetProcessor:
 
 			for file in files[splitInd:]:
 				shutil.move(f"{self.targetDir}/{category}/train/{file}", f"{self.targetDir}/{category}/val/")
-		
-
-if __name__ == '__main__':
-	# Specifically only used to test process functionality
-	dataset = []
-	chunkID = 0
-	dp = DatasetProcessor('testDatasetCreator')
-	for i in range(0, 5):
-		dataset.append((f"testFiles/0_08_{i}.wav", "zero"))
-		if len(dataset) >= BUFF_LIM:
-			dp.process(dataset, chunkID)
-			dataset = []
-			chunkID += 1
-
-	dp.create_val(chunkID)

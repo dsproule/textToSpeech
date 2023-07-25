@@ -30,9 +30,9 @@ class Caster:
 	def map_to_str(self, idMap, showInvalid=False):
 		mapping = []
 		for charID in idMap:
-			if charID is START_ID:
+			if charID == START_ID:
 				mapping.append('<s>')
-			elif charID is END_ID:
+			elif charID == END_ID:
 				mapping.append('<e>')
 			elif charID == SPACE_ID:
 				mapping.append(' ')

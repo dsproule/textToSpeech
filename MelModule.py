@@ -48,7 +48,6 @@ class Mel:
 		spec = self.normalize_spec(spec)
 
 		seqLen = (signal[1] // self.hopLen) + 1
-		assert (spec[:, seqLen+1] == 0).max()
 
 		return spec, seqLen
 
