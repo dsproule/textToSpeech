@@ -64,4 +64,4 @@ class Caster:
 		rawMap = self.str_to_map(string)
 		mapping[:rawMap.shape[0]] = rawMap
 
-		return mapping, len(string) + 2
+		return mapping, np.count_nonzero(mapping)

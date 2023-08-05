@@ -19,9 +19,8 @@ class Mel:
 
 	# _pad_sig()
 	# private function used to internally pad spectrograms.
-	# returns: (padded signal, original length)
+	# returns: padded signal
 	def _pad_sig(self, signal):
-		orig_len = signal.shape[0]
 		if signal.shape[0] < self.sampleLimit:
 			padded = np.zeros((self.sampleLimit))
 			padded[:signal.shape[0]] = signal
@@ -29,7 +28,15 @@ class Mel:
 		elif signal.shape[0] > self.sampleLimit:
 			raise OverflowError("Input file too long to be padded up.")
 
-		return signal, orig_len
+		return signal
+
+	# _get_unpadded_len()
+	# Takes a normalized spectrogram and the unpadded length 
+	def _get_unpadded_len(self, spec):
+		for frameNum in range(spec.shape[1] - 1, -1, -1):
+			if ((spec[:, frameNum] == 0).min() == False):
+				return frameNum+1
+		return 0
 
 	# mel_normalizer()
 	# normalizes an entire batch at once so the values range from 0 to 1
@@ -43,11 +50,11 @@ class Mel:
 	def conv(self, signal):
 		signal = self._pad_sig(signal)
 
-		spec = librosa.feature.melspectrogram(y=signal[0], sr=self.sr, n_fft=self.frameLen, hop_length=self.hopLen, n_mels=self.bands)
+		spec = librosa.feature.melspectrogram(y=signal, sr=self.sr, n_fft=self.frameLen, hop_length=self.hopLen, n_mels=self.bands)
 		spec = librosa.power_to_db(spec)
 		spec = self.normalize_spec(spec)
 
-		seqLen = (signal[1] // self.hopLen) + 1
+		seqLen = self._get_unpadded_len(spec)
 
 		return spec, seqLen
 

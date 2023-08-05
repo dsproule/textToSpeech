@@ -2,9 +2,11 @@
 # 	All defined by UPPER_CASE
 
 # Model constants
-BATCH_SIZE = 32
+BATCH_SIZE = 8
 EMBEDDING_SIZE = 128
 STRIKE_LIM = 4
+NO_PROGRESS_LIM = STRIKE_LIM * 300
+EMPTY_ID = 300
 
 # Caster constants
 BLANK_ID = 0
@@ -14,8 +16,11 @@ END_ID = 29
 
 # Dataset Constants
 BUFF_LIM = 256
-MAX_CLIP_DUR = 10
-MAX_TARGET_LEN = 215			# Actual target len is a little under 200
+MAX_CLIP_DUR = 3
+MAX_TARGET_LEN = 5
+TRAINING_TARGET_LEN = 20 * MAX_TARGET_LEN				# MUST BE LARGER THAN SPEC FRAMES
+
+# FIND AVG LABEL LEN, STANDARD DEVIATION 
 
 # Mel converter constants
 SR = 8000
